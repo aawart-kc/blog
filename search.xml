@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>TJCTF 2025- airport</title>
+    <url>/TJCTF/</url>
+    <content><![CDATA[✈️ Airport - TJC 2025 CTF WriteupChallenge Name: airportCategory: Misc   
+
+
+   
+   
+
+
+
+
+🧩 Challenge Description
+i made a mIstake and got lost, i always lose traCk of where i am oh no somebody kidnApped me please find where i am save me before i gO on this horrific planetjctf&#123;uppercasecode&#125;
+
+A single image file was provided:
+
+lost.png
+
+
+Step-by-Step Solution1. 🧠 Hidden Clues in DescriptionLooking at the capitalized letters in the challenge description:
+i made a mIstake and got lost, i always lose traCk of where i am oh no somebody kidnApped me please find where i am save me before i gO
+We extract: I C A O
+This hints that the answer is an ICAO airport code —  4-letter international airport identifier.
+
+2. 🖼️ Visual Inspection of the ImageThe image (lost.png) shows:
+
+A gate monitor display at an airport.
+Text in Spanish (e.g., “PUERTA” and “SÁBADO”).
+A visible fragment: &quot;UST&quot; (likely part of a destination name).
+This suggests a Spanish-speaking country, probably in Latin America.
+
+
+3. 🧾 Metadata ExtractionUsing exiftool on the image:
+I find:-
+City        : LIMA
+This gives a strong hint that the photo was taken in Lima, Peru.
+ICAO Code LookupSearching for the ICAO code of Jorge Chávez International Airport (Lima, Peru):
+ICAO code: SPIM
+Final Flag: tjctf{SPIM}
+]]></content>
+      <categories>
+        <category>OSINT</category>
+      </categories>
+      <tags>
+        <tag>OSINT</tag>
+        <tag>TJCTF 2025</tag>
+      </tags>
+  </entry>
+</search>

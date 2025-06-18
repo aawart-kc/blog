@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>nxp</title>
+  
+  <subtitle>nxp</subtitle>
+  <link href="https://blog.aawart.com.np/atom.xml" rel="self"/>
+  
+  <link href="https://blog.aawart.com.np/"/>
+  <updated>2025-06-17T15:36:40.336Z</updated>
+  <id>https://blog.aawart.com.np/</id>
+  
+  <author>
+    <name>Aawart K C</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>TJCTF 2025- airport</title>
+    <link href="https://blog.aawart.com.np/TJCTF/"/>
+    <id>https://blog.aawart.com.np/TJCTF/</id>
+    <published>2025-06-17T13:25:00.000Z</published>
+    <updated>2025-06-17T15:36:40.336Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="✈️-Airport-TJC-2025-CTF-Writeup"><a href="#✈️-Airport-TJC-2025-CTF-Writeup" class="headerlink" title="✈️ Airport - TJC 2025 CTF Writeup"></a>✈️ Airport - TJC 2025 CTF Writeup</h1><p><strong>Challenge Name:</strong> <code>airport</code><br><strong>Category:</strong> Misc   </p><hr><div style="display: flex; justify-content: center; gap: 20px;">  <img                       lazyload                     src="/images/loading.svg"                     data-src="/images/tjctf-airport.png"                      alt="Lost 1" style="width: 45%;"                 >   <img                       lazyload                     src="/images/loading.svg"                     data-src="/images/tjctf-lost.png"                      alt="Lost 2" style="width: 45%;"                 > </div><h2 id="🧩-Challenge-Description"><a href="#🧩-Challenge-Description" class="headerlink" title="🧩 Challenge Description"></a>🧩 Challenge Description</h2><blockquote><p>i made a mIstake and got lost, i always lose traCk of where i am oh no somebody kidnApped me please find where i am save me before i gO on this horrific plane<br><code>tjctf&#123;uppercasecode&#125;</code></p></blockquote><p>A single image file was provided:</p><ul><li><code>lost.png</code></li></ul><hr><h2 id="Step-by-Step-Solution"><a href="#Step-by-Step-Solution" class="headerlink" title="Step-by-Step Solution"></a>Step-by-Step Solution</h2><h3 id="1-🧠-Hidden-Clues-in-Description"><a href="#1-🧠-Hidden-Clues-in-Description" class="headerlink" title="1. 🧠 Hidden Clues in Description"></a>1. 🧠 Hidden Clues in Description</h3><p>Looking at the capitalized letters in the challenge description:</p><p>i made a mIstake and got lost, i always lose traCk of where i am oh no somebody kidnApped me please find where i am save me before i gO</p><p>We extract: I C A O</p><p>This hints that the answer is an <strong>ICAO airport code</strong> —  4-letter international airport identifier.</p><hr><h3 id="2-🖼️-Visual-Inspection-of-the-Image"><a href="#2-🖼️-Visual-Inspection-of-the-Image" class="headerlink" title="2. 🖼️ Visual Inspection of the Image"></a>2. 🖼️ Visual Inspection of the Image</h3><p>The image (<code>lost.png</code>) shows:</p><ul><li>A gate monitor display at an airport.</li><li>Text in <strong>Spanish</strong> (e.g., “PUERTA” and “SÁBADO”).</li><li>A visible fragment: <code>&quot;UST&quot;</code> (likely part of a destination name).</li><li>This suggests a <strong>Spanish-speaking country</strong>, probably in Latin America.</li></ul><hr><h3 id="3-🧾-Metadata-Extraction"><a href="#3-🧾-Metadata-Extraction" class="headerlink" title="3. 🧾 Metadata Extraction"></a>3. 🧾 Metadata Extraction</h3><p>Using <code>exiftool</code> on the image:</p><p>I find:-</p><p><code>City        : LIMA</code></p><p>This gives a strong hint that the photo was taken in Lima, Peru.</p><p>ICAO Code Lookup<br>Searching for the ICAO code of Jorge Chávez International Airport (Lima, Peru):</p><p>ICAO code: SPIM</p><p>Final Flag: tjctf{SPIM}</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;h1 id=&quot;✈️-Airport-TJC-2025-CTF-Writeup&quot;&gt;&lt;a href=&quot;#✈️-Airport-TJC-2025-CTF-Writeup&quot; class=&quot;headerlink&quot; title=&quot;✈️ Airport - TJC 2025 CTF Writ</summary>
+      
+    
+    
+    
+    <category term="OSINT" scheme="https://blog.aawart.com.np/categories/OSINT/"/>
+    
+    
+    <category term="OSINT" scheme="https://blog.aawart.com.np/tags/OSINT/"/>
+    
+    <category term="TJCTF 2025" scheme="https://blog.aawart.com.np/tags/TJCTF-2025/"/>
+    
+  </entry>
+  
+</feed>
